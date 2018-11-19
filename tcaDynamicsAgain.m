@@ -7,7 +7,7 @@ function out = tcaDynamicsAgain(t,x,F,T,V)
     delta = x(2);
     delta_dot = x(3);
     phi = x(4);
-    %phi_dot = x(5);
+    phi_dot = x(5);
     
     
     density = 1300; %density
@@ -34,10 +34,11 @@ function out = tcaDynamicsAgain(t,x,F,T,V)
     I = J/2;
     
     g = 9.81;
-    m_delta = density*Vol/4;
-%     alpha = asin(delta/l+L/l);
+    m_delta = density*Vol/4
+    alpha = asin(delta/l+L/l);
 %     m_phi = density*L*(pi/4*(2*d^4+d^2*(D/2)^2)+2*pi*cos(alpha)*((D/2+d/2)^4-(D/2-d/2)^4));
-    
+    r = l*cos(alpha)/phi;
+    m_phi = density*l^2*d^2*cos(asin(L/l))*(4*r^2+3*d^2)/(32*r);
     
     dT = 1/(density*Cp)*(V(t)^2/(R*l*Vol)-h*(temp-Tamb));
     
@@ -55,11 +56,11 @@ function out = tcaDynamicsAgain(t,x,F,T,V)
     dDTdD = phi/l^2;
     dDTdP = delta/l^2;
         
-    if delta == 0
-        phi_dot = 0;
-    else
-        phi_dot = (T(t)-dUdP)/(2*l*mu*J*dDTdP-phi*delta_dot/l^2+theta0*rho*dT/(l*(1+rho*(temp-Tamb))^2))*l^2/delta;
-    end
+%     if delta == 0
+%         phi_dot = 0;
+%     else
+%         phi_dot = (T(t)-dUdP)/(2*l*mu*J*dDTdP-phi*delta_dot/l^2+theta0*rho*dT/(l*(1+rho*(temp-Tamb))^2))*l^2/delta;
+%     end
     
     delta_tau_dot = (phi_dot*delta+phi*delta_dot)/l^2-theta0*rho*dT/(l*(1+rho*(temp-Tamb))^2);
     
@@ -68,10 +69,10 @@ function out = tcaDynamicsAgain(t,x,F,T,V)
     
    
     delta_ddot = (F(t)-dUdD+m_delta*g-dEdD)/m_delta;
-    %phi_ddot = (T(t)-dUdP-dEdP)/m_phi;
+    phi_ddot = (T(t)-dUdP-dEdP)/m_phi;
     
     
     
-    %out = [dT;delta_dot;delta_ddot;phi_dot;phi_ddot];
-    out = [dT;delta_dot;delta_ddot;phi_dot];
+    out = [dT;delta_dot;delta_ddot;phi_dot;phi_ddot];
+%     out = [dT;delta_dot;delta_ddot;phi_dot];
 end
