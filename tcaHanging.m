@@ -1,8 +1,10 @@
-function out = fullTCADynamics(t,x,F,V)
+function out = tcaHanging(t,x,F,V,M)
     %compute the full dynamics of the TCA
     %represents the ode for the displacement oand the temperature
     %V(t) is input voltage, F(t) is the applied force (positive is in
     %direction of positive displacement)
+    
+    %assumes a hanging weight dominates the mass and it can be specified
     
     temp = x(1);
     delta = x(2);
@@ -15,18 +17,19 @@ function out = fullTCADynamics(t,x,F,V)
     R = 3.5; %resistance per length
     h = 20; %convection with air
     Tamb = 25;
-    l = 0.248;
+    l = 1330e-3;
     d = 0.55e-3;
     Vol = l*pi*d^2/4;
     
     
-    L = 0.055;
-    theta0 = 2*pi*188;
-    D = 2e-3-0.55e-3;
+    L = 285e-3;
+    theta0 = 2*pi*760;
+    D = 2e-3-d;
 
     
     J = pi*d^4/32;
-    mu = 2.2e6;
+    %mu = 500000*3;\
+    b = 0.053;
     %mu = 0.1*l^2/(phi*J)
     E = 2.25e9;
     rho = 4e-4;
@@ -34,8 +37,12 @@ function out = fullTCADynamics(t,x,F,V)
     I = J/2;
     
     g = 9.81;
-    m_delta = density*Vol/4;
+    m_delta = M;
     phi = l*sqrt(1-L^2/l^2)/(D/2);
+    
+    %mu = b*l^3/(2*J*phi^2);
+    mu = 2.2e6;
+    
     
     
     dT = 1/(density*Cp)*(V(t)^2/(R*l*Vol)-h*(temp-Tamb));
