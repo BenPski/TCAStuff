@@ -1,4 +1,4 @@
-function out = tcaHanging(t,x,F,V,M)
+function out = tcaHangingStandard(t,x,F,V,M)
     %compute the full dynamics of the TCA
     %represents the ode for the displacement oand the temperature
     %V(t) is input voltage, F(t) is the applied force (positive is in
@@ -9,6 +9,7 @@ function out = tcaHanging(t,x,F,V,M)
     temp = x(1);
     delta = x(2);
     delta_dot = x(3);
+    T = x(4);
 
     
     
@@ -48,8 +49,8 @@ function out = tcaHanging(t,x,F,V,M)
     %mu = b*l^3/(2*J*phi^2);
     %mu = 2.2e6;
     %mu = b*l^3/(J*(phi^2)*L);
-    mu = 4e5;
-    
+    mu = 2e5;
+    relax_time = 0.004;    
     
     
     dT = 1/(density*Cp)*(V(t)^2/(R*l*Vol)-h*(temp-Tamb));
@@ -61,16 +62,21 @@ function out = tcaHanging(t,x,F,V,M)
     dKdD = -(delta+L)/sqrt(l^2-(delta+L)^2);
     
     dUdD = l*(G*J*delta_tau*dTdD+E*I*delta_kappa*dKdD);
+    %dUdD = l*(E*I*delta_kappa*dKdD);
     
     dDTdD = phi/l^2;
     
     delta_tau_dot = (phi*delta_dot)/l^2-theta0*rho*dT/(l*(1+rho*(temp-Tamb))^2);
     
-    dEdD = 2*l*mu*J*delta_tau_dot*dDTdD;
+    %dEdD = 2*l*mu*J*delta_tau_dot*dDTdD;
+    %dEdD = -l*T*dDTdD;
+    T_dot = 1/relax_time*(G*J*delta_tau+(G*relax_time+mu)*J*delta_tau_dot-T);
+    dEdD = -(2*l*mu*J*delta_tau_dot*dDTdD-l*relax_time*T_dot*dDTdD);
     
    
     delta_ddot = (F(t)-dUdD+m_delta*g-dEdD)/m_delta;
     
-    out = [dT;delta_dot;delta_ddot];
+    
+    out = [dT;delta_dot;delta_ddot;T_dot];
     
 end
